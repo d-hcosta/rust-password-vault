@@ -1,9 +1,3 @@
-<h2 align="center">
-  Password Vault
-</h2>
-
-<br/>
-
 ## Credits
 
 This project was built for study purposes, using this <a href="https://github.com/AkhilSharma90/rust-password-vault" target="_blank">repository</a> as a base, and then I refactored the code implementing SQLite.
