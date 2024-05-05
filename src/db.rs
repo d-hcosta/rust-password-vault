@@ -96,9 +96,14 @@ pub fn search_service_by_name(conn: &Connection, name: &str) -> Result<Option<Se
 
 /// Deletes a password entry from the database by service name.
 pub fn delete_entry_by_service(conn: &Connection, service: &str) -> Result<(), Error> {
-  conn.execute(
-      "DELETE FROM passwords WHERE service = ?",
-      &[service],
+  let rows_affected = conn.execute(
+    "DELETE FROM passwords WHERE service = ?",
+    &[service],
   )?;
+
+  if rows_affected == 0 {
+    return Err(Error::QueryReturnedNoRows);
+  }
+
   Ok(())
 }
