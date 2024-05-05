@@ -59,4 +59,22 @@ impl ServiceInfo {
   pub fn to_json(&self) -> String {
     serde_json::to_str(&self).expect("Failed to serialize to JSON.")
   }
+
+  pub fn write_to_file(&self) {
+    let json_output = format("{}\n", self.to_json());
+
+    match OpenOptions::new()
+      .create(true)
+      .append(true)
+      .open("passwords.json")
+        {
+          Ok(mut file) => {
+            file.write_all(json_output.as_bytes()){
+              eprintln!("Error writing to file: {}", e);
+            } else {
+              println!("Successfully wrote to passwords.json");
+            }
+          } Err (e) => eprintln!("Error opening file: {}", e)
+        }
+  }
 }
