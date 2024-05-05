@@ -55,7 +55,25 @@ fn main() {
       }
 
       "3" => {
-        clear()
+        clear();
+
+        let services = read_passwords_from_file().unwrap_or_else(|err| {
+          eprintln!("Error reading passwords:{}", err);
+          Vec::new()
+        });
+
+        let search = prompt("Search: ");
+
+        for item in &services {
+          if item.service.as_str() == search.as_str() {
+            println!(
+              "Service = {}
+              - Username : {}
+              - Password : {}",
+              item.service, item.username, item.password
+            );
+          }
+        }
       }
 
       "4" => {
