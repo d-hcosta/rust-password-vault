@@ -41,12 +41,22 @@ impl ServiceInfo {
       .read_line(&mut username)
       .expect("Failed to read line.");
 
-      println!("Enter Password: ");
+    println!("Enter Password: ");
 
-      let mut password = String::new();
+    let mut password = String::new();
 
-      io::stdin()
-        .read_line(&mut password)
-        .expect("Failed to read line.");
+    io::stdin()
+      .read_line(&mut password)
+      .expect("Failed to read line.");
+
+    ServiceInfo::new(
+      service.trim().to_string(),
+      username.trim().to_string(),
+      password.trim().to_string(),
+    )
+  }
+
+  pub fn to_json(&self) -> String {
+    serde_json::to_str(&self).expect("Failed to serialize to JSON.")
   }
 }
