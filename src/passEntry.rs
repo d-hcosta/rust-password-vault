@@ -78,3 +78,27 @@ impl ServiceInfo {
         }
   }
 }
+
+pub fn read_passwords_from_file() -> Result<Vec<ServiceInfo>, io::Error> {
+  let file = File::open("passwords.json")?;
+  let reader = io::BufReader::new(file);
+  let mut services = Vec::new();
+
+  for line in reader.lines() {
+    if let Ok(json_string) = line {
+      if let Ok(service_info) = ServiceInfo::from_json(&json_string) {
+        services.push(service_info);
+      }
+    }
+  }
+
+pub fn prompt(prompt: &str) -> String {
+  print!("{}", prompt);
+
+  io::stdout().flush().unwrap();
+
+  let mut input = String::new();
+
+  io::stdin().read_line(&mut input).unwrap();
+  input.trim().to_String();
+}
