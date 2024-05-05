@@ -2,6 +2,7 @@ mod db;
 
 use db::*;
 use rusqlite::Connection;
+use rusqlite::Error;
 
 const MENU: &str = r#"
  ______   ______     ______     ______        __   __   ______     __  __     __         ______
@@ -21,7 +22,8 @@ fn display_menu() {
   println!("1. Add Entry");
   println!("2. List Entries");
   println!("3. Search Entries");
-  println!("4. Quit");
+  println!("4. Delete Entry");
+  println!("5. Quit");
 }
 
 /// Handles adding an entry to the password manager.
@@ -74,6 +76,18 @@ fn search_entry(conn: &Connection) {
     }
 }
 
+/// Handles delete for an entry in the password manager.
+fn delete_entry(conn: &Connection) {
+  clear_screen();
+  let service_name = prompt("Delete by service name: ");
+
+  match delete_entry_by_service(&conn, &service_name) {
+    Ok(_) => println!("Entry deleted successfully."),
+    Err(Error::QueryReturnedNoRows) => println!("Service '{}' not found.", service_name),
+    Err(err) => eprintln!("There was an error trying to delete your entry: {}", err),
+  }
+}
+
 fn main() {
     let conn = init_database().expect("Failed to initialize the database");
     clear_screen();
@@ -86,7 +100,8 @@ fn main() {
             "1" => add_entry(&conn),
             "2" => list_entries(&conn),
             "3" => search_entry(&conn),
-            "4" => {
+            "4" => delete_entry(&conn),
+            "5" => {
                 clear_screen();
                 println!("Goodbye!");
                 break;

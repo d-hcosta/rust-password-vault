@@ -93,3 +93,12 @@ pub fn search_service_by_name(conn: &Connection, name: &str) -> Result<Option<Se
         Err(err) => Err(err),
     }
 }
+
+/// Deletes a password entry from the database by service name.
+pub fn delete_entry_by_service(conn: &Connection, service: &str) -> Result<(), Error> {
+  conn.execute(
+      "DELETE FROM passwords WHERE service = ?",
+      &[service],
+  )?;
+  Ok(())
+}
