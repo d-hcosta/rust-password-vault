@@ -58,11 +58,11 @@ impl ServiceInfo {
   }
 
   pub fn to_json(&self) -> String {
-    serde_json::to_str(&self).expect("Failed to serialize to JSON.")
+    serde_json::to_string(&self).expect("Failed to serialize to JSON.")
   }
 
   pub fn write_to_file(&self) {
-    let json_output = format("{}\n", self.to_json());
+    let json_output = format!("{}\n", self.to_json());
 
     match OpenOptions::new()
       .create(true)
@@ -103,5 +103,5 @@ pub fn prompt(prompt: &str) -> String {
   let mut input = String::new();
 
   io::stdin().read_line(&mut input).unwrap();
-  input.trim().to_string();
+  input.trim().to_string()
 }
