@@ -33,7 +33,17 @@ fn main() {
 
     match choice.trim() {
       "1" => {
+        clear();
 
+        let entry = ServiceInfo::new(
+          prompt("Service: ")
+          prompt("Username: ")
+          prompt("Password: ")
+        );
+
+        println!("Entry added successfully.");
+
+        entry.write_to_file();
       }
 
       "2" => {
