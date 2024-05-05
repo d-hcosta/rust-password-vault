@@ -2,6 +2,7 @@ mod passEntry;
 
 use crate::passEntry::prompt;
 use crate::passEntry::read_passwords_from_file;
+use crate::passEntry::ServiceInfo;
 
 fn clear() {
   print!("{}[2J", 27 as char);
@@ -36,9 +37,9 @@ fn main() {
         clear();
 
         let entry = ServiceInfo::new(
-          prompt("Service: ")
-          prompt("Username: ")
-          prompt("Password: ")
+          prompt("Service: "),
+          prompt("Username: "),
+          prompt("Password: "),
         );
 
         println!("Entry added successfully.");
@@ -92,7 +93,7 @@ fn main() {
         break;
       }
 
-      _ => println!("Invalid choice!");
+      _ => println!("Invalid choice!"),
 
     }
     println!("\n\n");

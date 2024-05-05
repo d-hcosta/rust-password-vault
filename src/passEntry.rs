@@ -3,6 +3,7 @@ use std::fs::File;
 use std::fs::OpenOptions;
 use std::io::BufRead;
 use std::io::Write;
+use std::io;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ServiceInfo {
   pub service: String,
@@ -69,7 +70,7 @@ impl ServiceInfo {
       .open("passwords.json")
         {
           Ok(mut file) => {
-            file.write_all(json_output.as_bytes()){
+            if let Err(e) = file.write_all(json_output.as_bytes()){
               eprintln!("Error writing to file: {}", e);
             } else {
               println!("Successfully wrote to passwords.json");
@@ -91,6 +92,8 @@ pub fn read_passwords_from_file() -> Result<Vec<ServiceInfo>, io::Error> {
       }
     }
   }
+  Ok(services)
+}
 
 pub fn prompt(prompt: &str) -> String {
   print!("{}", prompt);
@@ -100,5 +103,5 @@ pub fn prompt(prompt: &str) -> String {
   let mut input = String::new();
 
   io::stdin().read_line(&mut input).unwrap();
-  input.trim().to_String();
+  input.trim().to_string();
 }
