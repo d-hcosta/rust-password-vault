@@ -42,6 +42,7 @@ fn main() {
           prompt("Password: "),
         );
 
+        clear();
         println!("Entry added successfully.");
 
         entry.write_to_file();
