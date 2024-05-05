@@ -77,8 +77,14 @@ fn main() {
       }
 
       "4" => {
-
+        clear();
+        println!("Goodbye!");
+        break;
       }
+
+      _ => println!("Invalid choice!");
+
     }
+    println!("\n\n");
   }
 }
