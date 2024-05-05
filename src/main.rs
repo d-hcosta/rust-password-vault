@@ -1,7 +1,7 @@
-mod passEntry;
+mod db;
 
-use crate::passEntry::{prompt, read_passwords_from_file, ServiceInfo};
-use std::io::{self, Write};
+use db::*;
+use rusqlite::Connection;
 
 const MENU: &str = r#"
  ______   ______     ______     ______        __   __   ______     __  __     __         ______
@@ -11,61 +11,36 @@ const MENU: &str = r#"
   \/_/     \/_/\/_/   \/_____/   \/_____/      \/_/      \/_/\/_/   \/_____/   \/_____/     \/_/
 "#;
 
-enum MenuChoice {
-    AddEntry,
-    ListEntries,
-    SearchEntries,
-    Quit,
-}
-
 fn clear_screen() {
-    print!("{}[2J", 27 as char);
+  print!("{}[2J", 27 as char);
 }
 
-fn print_menu() {
-    println!("{}", MENU);
-    println!("Password Manager Menu:");
-    println!("1. Add Entry");
-    println!("2. List Entries");
-    println!("3. Search Entries");
-    println!("4. Quit");
+fn display_menu() {
+  println!("{}", MENU);
+  println!("Password Manager Menu:");
+  println!("1. Add Entry");
+  println!("2. List Entries");
+  println!("3. Search Entries");
+  println!("4. Quit");
 }
 
-fn get_choice() -> Result<MenuChoice, String> {
-    print!("Enter your choice: ");
-    io::stdout().flush().unwrap();
-
-    let mut choice = String::new();
-    io::stdin().read_line(&mut choice).unwrap();
-
-    match choice.trim() {
-        "1" => Ok(MenuChoice::AddEntry),
-        "2" => Ok(MenuChoice::ListEntries),
-        "3" => Ok(MenuChoice::SearchEntries),
-        "4" => Ok(MenuChoice::Quit),
-        _ => Err("Invalid choice!".to_string()),
-    }
-}
-
-fn add_entry() {
+/// Handles adding an entry to the password manager.
+fn add_entry(conn: &Connection) {
     clear_screen();
-
     let entry = ServiceInfo::new(
-        prompt("Service: "),
-        prompt("Username: "),
-        prompt("Password: "),
+        &prompt("Service :"),
+        &prompt("Username :"),
+        &prompt("Password :"),
     );
-
-    clear_screen();
+    insert_password_into_db(conn, &entry.service, &entry.username, &entry.password)
+        .expect("Failed to insert to the database");
     println!("Entry added successfully.");
-
-    entry.write_to_file();
 }
 
-fn list_entries() {
+/// Handles listing all entries in the password manager.
+fn list_entries(conn: &Connection) {
     clear_screen();
-
-    match read_passwords_from_file() {
+    match read_passwords_from_db(conn) {
         Ok(services) => {
             for item in &services {
                 println!(
@@ -78,46 +53,44 @@ fn list_entries() {
     }
 }
 
-fn search_entries() {
+/// Handles searching for an entry in the password manager.
+fn search_entry(conn: &Connection) {
     clear_screen();
-
-    let services = match read_passwords_from_file() {
-        Ok(services) => services,
-        Err(err) => {
-            eprintln!("Error reading passwords: {}", err);
-            return;
-        }
-    };
-
-    let search = prompt("Search: ");
-
-    for item in &services {
-        if item.service == search {
+    let search = prompt("Search by service name:");
+    match search_service_by_name(conn, &search) {
+        Ok(Some(entry)) => {
             println!(
-                "Service = {}\n- Username : {}\n- Password : {}",
-                item.service, item.username, item.password
+                "Service = {}\n- Username : {}\n- Password : {:?}",
+                entry.service, entry.username, entry.password
             );
+        }
+        Ok(None) => {
+            println!("Service not found.");
+        }
+        Err(err) => {
+            eprintln!("Error searching for service: {}", err);
         }
     }
 }
 
 fn main() {
+    let conn = init_database().expect("Failed to initialize the database");
     clear_screen();
 
     loop {
-        print_menu();
-        match get_choice() {
-            Ok(choice) => match choice {
-                MenuChoice::AddEntry => add_entry(),
-                MenuChoice::ListEntries => list_entries(),
-                MenuChoice::SearchEntries => search_entries(),
-                MenuChoice::Quit => {
-                    clear_screen();
-                    println!("Goodbye!");
-                    break;
-                }
-            },
-            Err(err) => println!("{}", err),
+        display_menu();
+        let choice = prompt("Enter your choice:");
+
+        match choice.as_str() {
+            "1" => add_entry(&conn),
+            "2" => list_entries(&conn),
+            "3" => search_entry(&conn),
+            "4" => {
+                clear_screen();
+                println!("Goodbye!");
+                break;
+            }
+            _ => println!("Invalid choice."),
         }
         println!("\n\n");
     }
