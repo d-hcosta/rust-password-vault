@@ -28,12 +28,13 @@ fn display_menu() {
 fn add_entry(conn: &Connection) {
     clear_screen();
     let entry = ServiceInfo::new(
-        &prompt("Service :"),
-        &prompt("Username :"),
-        &prompt("Password :"),
+        &prompt("Service: "),
+        &prompt("Username: "),
+        &prompt("Password: "),
     );
     insert_password_into_db(conn, &entry.service, &entry.username, &entry.password)
         .expect("Failed to insert to the database");
+    clear_screen();
     println!("Entry added successfully.");
 }
 
@@ -56,7 +57,7 @@ fn list_entries(conn: &Connection) {
 /// Handles searching for an entry in the password manager.
 fn search_entry(conn: &Connection) {
     clear_screen();
-    let search = prompt("Search by service name:");
+    let search = prompt("Search by service name: ");
     match search_service_by_name(conn, &search) {
         Ok(Some(entry)) => {
             println!(
@@ -79,7 +80,7 @@ fn main() {
 
     loop {
         display_menu();
-        let choice = prompt("Enter your choice:");
+        let choice = prompt("Enter your choice: ");
 
         match choice.as_str() {
             "1" => add_entry(&conn),
