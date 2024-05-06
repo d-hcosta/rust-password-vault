@@ -1,3 +1,11 @@
+<h1 align="center">Rust Password Vault</h1>
+
+<div align="center">
+   
+   ![](https://github.com/d-hcosta/rust-password-vault/blob/master/static/gif-example.gif)
+   
+</div>
+
 ## Credits
 
 This project was built for study purposes, using this <a href="https://github.com/AkhilSharma90/rust-password-vault" target="_blank">repository</a> as a base, and then I refactored the code implementing SQLite.
